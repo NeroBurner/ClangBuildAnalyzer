@@ -11,6 +11,7 @@
 #include <time.h>
 #include <algorithm>
 #include <set>
+#include <cmath>
 
 #ifdef _MSC_VER
 struct IUnknown; // workaround for old Win SDK header failures when using /permissive-
