@@ -35,12 +35,17 @@ jobs:
     strategy:
       fail-fast: false
     steps:
-    - uses: actions/checkout@v1
-    - name: macOS Xcode 11.1
-      run: |
-        xcodebuild -project projects/xcode/ClangBuildAnalyzer.xcodeproj -configuration Debug build
-        xcodebuild -project projects/xcode/ClangBuildAnalyzer.xcodeproj -configuration Release build
-        projects/xcode/build/Release/ClangBuildAnalyzer --test tests
+    - uses: actions/checkout@v2
+    - name: Configure CMake Debug
+      run: cmake -S . -B ${{runner.workspace}}/build/Debug -DCMAKE_BUID_TYPE=Debug
+    - name: Build Debug
+      run: cmake --build ${{runner.workspace}}/build/Debug -j2
+    - name: Configure CMake Release
+      run: cmake -S . -B ${{runner.workspace}}/build/Release -DCMAKE_BUID_TYPE=Release
+    - name: Build Release
+      run: cmake --build ${{runner.workspace}}/build/Release -j2
+    - name: Test
+      run: build/Release/ClangBuildAnalyzer --test tests
     - uses: actions/upload-artifact@v1
       with:
         name: ClangBuildAnalyzer-mac
