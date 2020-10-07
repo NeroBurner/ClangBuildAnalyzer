@@ -59,9 +59,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Ubuntu16 Gcc7 CMake
-      env:
-        CC: gcc-7
-        CXX: g++-7
       run: |
         mkdir buildCmake
         cd buildCmake
@@ -69,6 +66,10 @@ jobs:
         cmake --build buildCmake -j2
         buildCmake/ClangBuildAnalyzer --test tests
     - name: Ubuntu16 Gcc7 Make
+      env:
+        CC: gcc-7
+        CXX: g++-7
+      run: |
         make -f projects/make/Makefile -j 2
         build/ClangBuildAnalyzer --test tests
     - uses: actions/upload-artifact@v1
