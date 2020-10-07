@@ -60,8 +60,6 @@ jobs:
     - uses: actions/checkout@v2
     - name: Ubuntu16 Gcc7 CMake
       run: |
-        mkdir buildCmake
-        cd buildCmake
         cmake -H. -BbuildCmake -DCMAKE_BUILD_TYPE=Release
         cmake --build buildCmake -j2
         buildCmake/ClangBuildAnalyzer --test tests
@@ -71,7 +69,6 @@ jobs:
         CXX: g++-7
       run: |
         make -f projects/make/Makefile -j 2
-        build/ClangBuildAnalyzer --test tests
     - uses: actions/upload-artifact@v1
       with:
         name: ClangBuildAnalyzer-linux
