@@ -9,13 +9,13 @@ struct IUnknown; // workaround for old Win SDK header failures when using /permi
 #include "Arena.h"
 #include "Colors.h"
 #include "Utils.h"
-#include "external/flat_hash_map/bytell_hash_map.hpp"
 #include "external/inih/cpp/INIReader.h"
 #include <algorithm>
 #include <assert.h>
 #include <string>
 #include <string.h>
 #include <vector>
+#include <unordered_map>
 
 struct Config
 {
@@ -102,25 +102,25 @@ struct Analysis
         std::vector<IncludeChain> includePaths;
     };
 
-    ska::bytell_hash_map<DetailIndex, std::string_view> collapsedNames;
+    std::unordered_map<DetailIndex, std::string_view> collapsedNames;
     std::string_view GetCollapsedName(DetailIndex idx);
     void EmitCollapsedTemplates();
     void EmitCollapsedTemplateOpt();
     void EmitCollapsedInfo(
-        const ska::bytell_hash_map<std::string_view, InstantiateEntry> &collapsed,
+        const std::unordered_map<std::string_view, InstantiateEntry> &collapsed,
         const char *header_string);
 
     // key is (name,objfile), value is milliseconds
     typedef std::pair<DetailIndex, DetailIndex> IndexPair;
-    ska::bytell_hash_map<IndexPair, int64_t, pair_hash> functions;
-    ska::bytell_hash_map<EventIndex, InstantiateEntry> instantiations;
+    std::unordered_map<IndexPair, int64_t, pair_hash> functions;
+    std::unordered_map<EventIndex, InstantiateEntry> instantiations;
     std::vector<FileEntry> parseFiles;
     std::vector<FileEntry> codegenFiles;
     int64_t totalParseUs = 0;
     int64_t totalCodegenUs = 0;
     int totalParseCount = 0;
 
-    ska::bytell_hash_map<std::string_view, IncludeEntry> headerMap;
+    std::unordered_map<std::string_view, IncludeEntry> headerMap;
     std::vector<std::pair<std::string_view, int64_t>> expensiveHeaders;
 
     Config config;
@@ -282,7 +282,7 @@ std::string_view Analysis::GetCollapsedName(DetailIndex detail)
 }
 
 void Analysis::EmitCollapsedInfo(
-    const ska::bytell_hash_map<std::string_view, InstantiateEntry> &collapsed,
+    const std::unordered_map<std::string_view, InstantiateEntry> &collapsed,
     const char *header_string)
 {
     std::vector<std::pair<std::string, InstantiateEntry>> sorted_collapsed;
@@ -309,7 +309,7 @@ void Analysis::EmitCollapsedInfo(
 }
 void Analysis::EmitCollapsedTemplates()
 {
-    ska::bytell_hash_map<std::string_view, InstantiateEntry> collapsed;
+    std::unordered_map<std::string_view, InstantiateEntry> collapsed;
     for (const auto& inst : instantiations)
     {
         const std::string_view name = GetCollapsedName(events[inst.first].detailIndex);
@@ -342,7 +342,7 @@ void Analysis::EmitCollapsedTemplates()
 
 void Analysis::EmitCollapsedTemplateOpt()
 {
-    ska::bytell_hash_map<std::string_view, InstantiateEntry> collapsed;
+    std::unordered_map<std::string_view, InstantiateEntry> collapsed;
     for (const auto& fn : functions)
     {
         auto fnNameIndex = fn.first.first;

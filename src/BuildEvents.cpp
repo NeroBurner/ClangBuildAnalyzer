@@ -6,13 +6,13 @@
 #include "Colors.h"
 #include "Utils.h"
 #include "external/cute_files.h"
-#include "external/flat_hash_map/bytell_hash_map.hpp"
 #include "external/llvm-Demangle/include/Demangle.h"
 #include "external/simdjson/simdjson.h"
 #include "external/xxHash/xxhash.h"
 #include <assert.h>
 #include <iterator>
 #include <mutex>
+#include <unordered_map>
 
 struct HashedString
 {
@@ -44,7 +44,7 @@ namespace std
     };
 } // namespace std
 
-typedef ska::bytell_hash_map<HashedString, DetailIndex> NameToIndexMap;
+typedef std::unordered_map<HashedString, DetailIndex> NameToIndexMap;
 
 
 static void DebugPrintEvents(const BuildEvents& events, const BuildNames& names)
@@ -159,7 +159,7 @@ struct BuildEventsParser
         
         // create remapping from name indices, adding them to global remapping
         // list if necessary.
-        ska::bytell_hash_map<DetailIndex, DetailIndex> detailRemap;
+        std::unordered_map<DetailIndex, DetailIndex> detailRemap;
         for (const auto& kvp : nameToIndex)
         {
             const auto& existing = resultNameToIndex.find(kvp.first);
