@@ -57,18 +57,18 @@ jobs:
     strategy:
       fail-fast: false
     steps:
-    - uses: actions/checkout@v1
-    - name: Ubuntu16 Gcc7
+    - uses: actions/checkout@v2
+    - name: Ubuntu16 Gcc7 CMake
       env:
         CC: gcc-7
         CXX: g++-7
       run: |
         mkdir buildCmake
         cd buildCmake
-        cmake -DCMAKE_BUILD_TYPE=Release ..
-        make -j 2
-        cd ..
+        cmake -H. -BbuildCmake -DCMAKE_BUILD_TYPE=Release
+        cmake --build buildCmake -j2
         buildCmake/ClangBuildAnalyzer --test tests
+    - name: Ubuntu16 Gcc7 Make
         make -f projects/make/Makefile -j 2
         build/ClangBuildAnalyzer --test tests
     - uses: actions/upload-artifact@v1
