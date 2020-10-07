@@ -13,17 +13,21 @@ jobs:
     strategy:
       fail-fast: false
     steps:
-    - uses: actions/checkout@v1
-    - name: Windows VS2019
-      run: |
-        call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat" && msbuild.exe projects/vs2019/ClangBuildAnalyzer.sln /p:Configuration=Debug /p:CL_MPCount=2
-        call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat" && msbuild.exe projects/vs2019/ClangBuildAnalyzer.sln /p:Configuration=Release /p:CL_MPCount=2
-        build\ClangBuildAnalyzer.exe --test tests
-      shell: cmd
+    - uses: actions/checkout@v2
+    - name: Configure CMake
+      shell: powershell
+      run: cmake -S . -B ${{runner.workspace}}/build
+    - name: Build
+      shell: powershell
+      run: cmake --build ${{runner.workspace}}/build  --config $BUILD_TYPE -j2
+    - name: Test
+      shell: powershell
+      run: build\ClangBuildAnalyzer.exe --test tests
     - uses: actions/upload-artifact@v1
       with:
         name: ClangBuildAnalyzer-win.exe
         path: build/ClangBuildAnalyzer.exe
+
 
   mac:
     runs-on: macOS-latest
